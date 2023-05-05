@@ -6,8 +6,7 @@ import GameConfig from "./gameConfig";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class GameManager extends cc.Component
-{
+export default class GameManager extends cc.Component {
 
     @property(cc.Prefab)
     public agentPrefab: cc.Prefab = null;
@@ -18,8 +17,7 @@ export default class GameManager extends cc.Component
 
     private _stepInterval: number = 0;
 
-    start()
-    {
+    start() {
 
         this.node.on(cc.Node.EventType.MOUSE_DOWN, this.createObstacle, this);
 
@@ -30,19 +28,16 @@ export default class GameManager extends cc.Component
         this.createAgents();
     }
 
-    protected update(dt: number): void
-    {
+    protected update(dt: number): void {
         Simulator.Instance.doStep();
     }
 
-    private createAgents()
-    {
+    private createAgents() {
         let center = cc.v2(0, 0);
         let agentNum = GameConfig.agentCount;
         let radius = 200;
 
-        for (let i = 0; i < agentNum; i++)
-        {
+        for (let i = 0; i < agentNum; i++) {
             let v2 = this.getPosInCircle(360 / agentNum * i, radius, center);
             let sid = this.createAgent(v2);
             let ga = this._agentMap[sid];
@@ -50,13 +45,11 @@ export default class GameManager extends cc.Component
         }
     }
 
-    private createAgent(position: Vector2)
-    {
+    private createAgent(position: Vector2) {
         if (!this.agentPrefab) return;
         let sid = Simulator.Instance.addAgent(position);
 
-        if (sid > -1)
-        {
+        if (sid > -1) {
             let node = cc.instantiate(this.agentPrefab);
             node.name = "agent_" + sid;
             this.node.parent.addChild(node);
@@ -70,8 +63,7 @@ export default class GameManager extends cc.Component
         return sid;
     }
 
-    private createObstacle(event: cc.Event.EventMouse)
-    {
+    private createObstacle(event: cc.Event.EventMouse) {
         if (!this.obstaclePrefab) return;
         let parent = this.node.parent;
         let node = cc.instantiate(this.obstaclePrefab);
@@ -86,8 +78,7 @@ export default class GameManager extends cc.Component
      * @param center 
      * @returns 
      */
-    private getPosInCircle(angle: number, radius: number, center: cc.Vec2)
-    {
+    private getPosInCircle(angle: number, radius: number, center: cc.Vec2) {
         let x = Math.floor(center.x + radius * Math.cos(angle * Math.PI / 180));
         let y = Math.floor(center.y + radius * Math.sin(angle * Math.PI / 180));
 
@@ -95,10 +86,8 @@ export default class GameManager extends cc.Component
     }
 
     /**科学计数法转换为10进制 */
-    private transferToNumber(inputNumber)
-    {
-        if (isNaN(inputNumber))
-        {
+    private transferToNumber(inputNumber) {
+        if (isNaN(inputNumber)) {
             return inputNumber
         }
         inputNumber = '' + inputNumber

@@ -164,7 +164,15 @@ export default class Simulator {
         this.timeStep_ = timeStep;
     }
 
-    public setAgentDefaults(neighborDist: number, maxNeighbors: number, timeHorizon: number, timeHorizonObst: number, radius: number, maxSpeed: number, velocity: Vector2) {
+    public setAgentDefaults(
+        neighborDist: number,
+        maxNeighbors: number,
+        timeHorizon: number,
+        timeHorizonObst: number,
+        radius: number,
+        maxSpeed: number,
+        velocity: Vector2
+    ) {
         if (this.defaultAgent_ == null) {
             this.defaultAgent_ = new Agent();
         }

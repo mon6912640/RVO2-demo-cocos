@@ -3,11 +3,11 @@ import Vector2 from "../RVO/Vector2";
 export default class GameConfig
 {
     /**代理对象总数 */
-    public static agentCount = 60;
+    public static agentCount = 50;
     /**代理对象之间的距离 */
-    public static neighborDist = 35;
+    public static neighborDist = 45;
     /**代理对象的半径 */
-    public static radius = 10;
+    public static radius = 15;
     /**代理对象的最大移动速度 */
     public static maxSpeed = 200;
     /**代理对象的初始速度 */

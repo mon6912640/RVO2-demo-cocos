@@ -6,11 +6,9 @@ import GameConfig from "./gameConfig";
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class GameAgent extends cc.Component
-{
+export default class GameAgent extends cc.Component {
     private _sid: number = -1;
-    public set sid(val: number)
-    {
+    public set sid(val: number) {
         this._sid = val;
         this._sidLab.string = val + "";
     }
@@ -19,39 +17,31 @@ export default class GameAgent extends cc.Component
 
     private _sidLab: cc.Label;
 
-    onLoad()
-    {
+    onLoad() {
         this._sidLab = this.node.getChildByName("sid").getComponent(cc.Label);
     }
 
-    update(dt)
-    {
-        if (this._sid > -1)
-        {
+    update(dt) {
+        if (this._sid > -1) {
             let pos: Vector2 = Simulator.Instance.getAgentPosition(this._sid);
             let vel: Vector2 = Simulator.Instance.getAgentPrefVelocity(this._sid);
 
-            if (!Number.isNaN(pos.x) && !Number.isNaN(pos.y))
-            {
+            if (!Number.isNaN(pos.x) && !Number.isNaN(pos.y)) {
                 this.node.setPosition(pos.x, pos.y);
-            } else
-            {
+            } else {
                 console.log(`sid=${this._sid}的对象PosX=${pos.x},PosY=${pos.y}`);
             }
         }
         this.updatePrefVelocity();
     }
 
-    public updatePrefVelocity()
-    {
-        if (this.targetPos != null)
-        {
+    public updatePrefVelocity() {
+        if (this.targetPos != null) {
             let curPos = Simulator.Instance.getAgentPosition(this._sid);
             let targetPos = this.targetPos;
 
             let goalVector = Vector2.subtract(targetPos, curPos);
-            if (RVOMath.absSq(goalVector) > 1)
-            {
+            if (RVOMath.absSq(goalVector) > 1) {
                 goalVector = RVOMath.normalize(goalVector);
             }
             Simulator.Instance.setAgentPrefVelocity(this._sid, goalVector);
