@@ -75,19 +75,33 @@ export default class Simulator {
             this.onDelAgent();
     }
 
-    public addAgent(position: Vector2) {
-        if (this.defaultAgent_ == null) return -1;
+    public addAgent(position: Vector2, pCfg: AgentCfg = null) {
+        if (this.defaultAgent_ == null)
+            return -1;
         let agent = new Agent();
         agent.id_ = Simulator.s_totalID;
         Simulator.s_totalID++;
-        agent.maxNeighbors_ = this.defaultAgent_.maxNeighbors_;
-        agent.maxSpeed_ = this.defaultAgent_.maxSpeed_;
-        agent.neighborDist_ = this.defaultAgent_.neighborDist_;
-        agent.position_ = position;
-        agent.radius_ = this.defaultAgent_.radius_;
-        agent.timeHorizon_ = this.defaultAgent_.timeHorizon_;
-        agent.timeHorizonObst_ = this.defaultAgent_.timeHorizonObst_;
-        agent.velocity_ = this.defaultAgent_.velocity_;
+        if (pCfg) {
+            agent.maxNeighbors_ = pCfg.maxNeighbors;
+            agent.maxSpeed_ = pCfg.maxSpeed;
+            agent.neighborDist_ = pCfg.neighborDist;
+            agent.position_ = position;
+            agent.radius_ = pCfg.radius;
+            agent.timeHorizon_ = pCfg.timeHorizon;
+            agent.timeHorizonObst_ = pCfg.timeHorizonObst;
+            agent.velocity_ = pCfg.velocity;
+        }
+        else {
+            agent.maxNeighbors_ = this.defaultAgent_.maxNeighbors_;
+            agent.maxSpeed_ = this.defaultAgent_.maxSpeed_;
+            agent.neighborDist_ = this.defaultAgent_.neighborDist_;
+            agent.position_ = position;
+            agent.radius_ = this.defaultAgent_.radius_;
+            agent.timeHorizon_ = this.defaultAgent_.timeHorizon_;
+            agent.timeHorizonObst_ = this.defaultAgent_.timeHorizonObst_;
+            agent.velocity_ = this.defaultAgent_.velocity_;
+        }
+
         this.agents_.push(agent);
         this.onAddAgent();
         return agent.id_;
@@ -184,6 +198,8 @@ export default class Simulator {
         this.defaultAgent_.timeHorizon_ = timeHorizon;
         this.defaultAgent_.timeHorizonObst_ = timeHorizonObst;
         this.defaultAgent_.velocity_ = velocity;
+
+        return this.defaultAgent_;
     }
 
     public processObstacles() {
@@ -192,5 +208,51 @@ export default class Simulator {
 
     public setAgentPrefVelocity(agentNo: number, prefVelocity: Vector2) {
         this.agents_[this.agentNo2indexDict_.get(agentNo)].prefVelocity_ = prefVelocity;
+    }
+}
+
+export class AgentCfg {
+    public neighborDist: number;
+    public maxNeighbors: number;
+    public timeHorizon: number;
+    public timeHorizonObst: number;
+    public radius: number;
+    public maxSpeed: number;
+    public velocity: Vector2;
+
+    constructor(
+        neighborDist?: number,
+        maxNeighbors?: number,
+        timeHorizon?: number,
+        timeHorizonObst?: number,
+        radius?: number,
+        maxSpeed?: number,
+        velocity?: Vector2
+    ) {
+        if (neighborDist != undefined)
+            this.neighborDist = neighborDist;
+        if (maxNeighbors != undefined)
+            this.maxNeighbors = maxNeighbors;
+        if (timeHorizon != undefined)
+            this.timeHorizon = timeHorizon;
+        if (timeHorizonObst != undefined)
+            this.timeHorizonObst = timeHorizonObst;
+        if (radius != undefined)
+            this.radius = radius;
+        if (maxSpeed != undefined)
+            this.maxSpeed = maxSpeed;
+        if (velocity != undefined)
+            this.velocity = velocity;
+    }
+
+    copyFromAgent(pAgent: Agent) {
+        let t = this;
+        t.neighborDist = pAgent.neighborDist_;
+        t.maxNeighbors = pAgent.maxNeighbors_;
+        t.timeHorizon = pAgent.timeHorizon_;
+        t.timeHorizonObst = pAgent.timeHorizonObst_;
+        t.radius = pAgent.radius_;
+        t.maxSpeed = pAgent.maxSpeed_;
+        t.velocity = pAgent.velocity_;
     }
 }

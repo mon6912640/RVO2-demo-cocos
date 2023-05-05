@@ -12,14 +12,21 @@ export default class Agent {
     public orcaLines_: Array<Line> = [];
     public position_: Vector2;
     public prefVelocity_: Vector2 = new Vector2(0, 0);
-    public velocity_: Vector2;
     public id_: number;
+
+    public velocity_: Vector2;
+    /** 寻找周围邻居的最大数目，这个值设置越大，最终计算的速度越 精确，但会加大计算量 */
     public maxNeighbors_: number;
-    public maxSpeed_: number;
+    /** 在寻找周围邻居的搜索距离，这个值设置过大，会让小球在很远 距离的时候做出避障行为 */
     public neighborDist_: number;
+    /** 代表计算ORCA时的小球的半径，这个值不一定与小球实际显示的半径 一样，偏小有利于小球移动顺畅 */
     public radius_: number;
+    /** 理解为预测提前规避时间，他与速度有关系，你预测的越早的话，提前就会做出速度修改（但是原文说会限制速度，不是很明白怎么限制的） */
     public timeHorizon_: number;
     public timeHorizonObst_: number;
+    /** 最大速度，由于RVO中不考虑加速度，他是直接变速的，所以最大能变的速度是多少会和这个提前规避时间一起作用得到规避时的动作幅度 */
+    public maxSpeed_: number;
+
     public needDelete_: boolean = false;
 
     private newVelocity_: Vector2 = new Vector2(0, 0);

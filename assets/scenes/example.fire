@@ -312,6 +312,12 @@
     "agentPrefab": {
       "__uuid__": "b7a5df34-9405-4f5e-b3e9-d86405015456"
     },
+    "agent1Prefab": {
+      "__uuid__": "0ccaaff2-1d28-40ea-bdc7-f54984c5788d"
+    },
+    "agent2Prefab": {
+      "__uuid__": "bd83f6b6-bfe2-497e-bc2c-4d3aea5d12cc"
+    },
     "obstaclePrefab": {
       "__uuid__": "f4018949-bcfe-479a-a199-0a9351328d92"
     },

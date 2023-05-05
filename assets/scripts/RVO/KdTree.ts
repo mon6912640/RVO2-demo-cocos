@@ -73,20 +73,22 @@ class FloatPair {
 }
 
 export default class KdTree {
-    private agents_: Array<Agent>;
+    private agents_: Agent[] = [];
     private obstacleTree_: ObstacleTreeNode;
-    private agentTree_: Array<AgentTreeNode>;
+    private agentTree_: AgentTreeNode[] = [];
     private MAX_LEAF_SIZE = 10;
 
     public buildAgentTree() {
         if (this.agents_ == null || this.agents_.length != Simulator.Instance.agents_.length) {
-            this.agents_ = new Array(Simulator.Instance.agents_.length);
+            // this.agents_ = new Array(Simulator.Instance.agents_.length);
+            this.agents_.length = Simulator.Instance.agents_.length;
             let len1 = this.agents_.length;
             for (let i = 0; i < len1; ++i) {
                 this.agents_[i] = Simulator.Instance.agents_[i];
             }
 
-            this.agentTree_ = [];
+            // this.agentTree_ = [];
+            this.agentTree_.length = 2 * this.agents_.length;
             let len = 2 * this.agents_.length;
             for (let i = 0; i < len; ++i) {
                 this.agentTree_[i] = new AgentTreeNode();
