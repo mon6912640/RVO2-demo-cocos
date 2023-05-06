@@ -37,7 +37,8 @@ export default class GameManager extends cc.Component {
             GameConfig.timeHorizonObst,
             GameConfig.radius,
             GameConfig.maxSpeed,
-            GameConfig.velocity
+            GameConfig.velocity,
+            GameConfig.mass,
         );
 
         this._agentCfg1 = new AgentCfg();
@@ -49,6 +50,8 @@ export default class GameManager extends cc.Component {
         this._agentCfg2.copyFromAgent(this._defaultAgent);
         this._agentCfg2.radius = 40;
         this._agentCfg2.neighborDist = this._agentCfg2.radius * 3;
+        this._agentCfg2.speedFactor = 4;
+        this._agentCfg2.mass = 200;
 
         this.createAgents();
     }
@@ -70,23 +73,37 @@ export default class GameManager extends cc.Component {
             let sid = this.createAgent(v2, t_type);
             if (sid > -1) {
                 let ga = this._agentMap[sid];
-                ga.targetPos = this.getPosInCircle((360 / agentNum * i) - 180, radius, center);
-                // ga.targetPos = new Vector2(0, 0);
+                // ga.targetPos = this.getPosInCircle((360 / agentNum * i) - 180, radius, center);
+                ga.targetPos = new Vector2(0, 0);
+                let t_agentCfg = this.getAgentCfg(t_type);
+                if (t_agentCfg) {
+                    ga.speedFactor = t_agentCfg.speedFactor;
+                }
             }
+        }
+    }
+
+    private getAgentCfg(pType = 0) {
+        let t = this;
+        switch (pType) {
+            case 1:
+                return t._agentCfg1;
+            case 2:
+                return t._agentCfg2;
+            default:
+                return null;
         }
     }
 
     private createAgent(position: Vector2, pType = 0) {
         let t_prefab: cc.Prefab = null;
-        let t_agentCfg: AgentCfg = null;
+        let t_agentCfg: AgentCfg = this.getAgentCfg(pType);
         switch (pType) {
             case 1:
                 t_prefab = this.agent1Prefab;
-                t_agentCfg = this._agentCfg1;
                 break;
             case 2:
                 t_prefab = this.agent2Prefab;
-                t_agentCfg = this._agentCfg2;
                 break;
             default:
                 t_prefab = this.agentPrefab;

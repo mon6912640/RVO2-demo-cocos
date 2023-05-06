@@ -90,6 +90,7 @@ export default class Simulator {
             agent.timeHorizon_ = pCfg.timeHorizon;
             agent.timeHorizonObst_ = pCfg.timeHorizonObst;
             agent.velocity_ = pCfg.velocity;
+            agent.mass_ = pCfg.mass;
         }
         else {
             agent.maxNeighbors_ = this.defaultAgent_.maxNeighbors_;
@@ -100,6 +101,7 @@ export default class Simulator {
             agent.timeHorizon_ = this.defaultAgent_.timeHorizon_;
             agent.timeHorizonObst_ = this.defaultAgent_.timeHorizonObst_;
             agent.velocity_ = this.defaultAgent_.velocity_;
+            agent.mass_ = this.defaultAgent_.mass_;
         }
 
         this.agents_.push(agent);
@@ -185,7 +187,8 @@ export default class Simulator {
         timeHorizonObst: number,
         radius: number,
         maxSpeed: number,
-        velocity: Vector2
+        velocity: Vector2,
+        mass: number,
     ) {
         if (this.defaultAgent_ == null) {
             this.defaultAgent_ = new Agent();
@@ -198,6 +201,7 @@ export default class Simulator {
         this.defaultAgent_.timeHorizon_ = timeHorizon;
         this.defaultAgent_.timeHorizonObst_ = timeHorizonObst;
         this.defaultAgent_.velocity_ = velocity;
+        this.defaultAgent_.mass_ = mass;
 
         return this.defaultAgent_;
     }
@@ -219,6 +223,9 @@ export class AgentCfg {
     public radius: number;
     public maxSpeed: number;
     public velocity: Vector2;
+    mass: number;
+
+    speedFactor: number = 1;
 
     constructor(
         neighborDist?: number,
@@ -227,7 +234,8 @@ export class AgentCfg {
         timeHorizonObst?: number,
         radius?: number,
         maxSpeed?: number,
-        velocity?: Vector2
+        velocity?: Vector2,
+        mass?: number
     ) {
         if (neighborDist != undefined)
             this.neighborDist = neighborDist;
@@ -243,6 +251,8 @@ export class AgentCfg {
             this.maxSpeed = maxSpeed;
         if (velocity != undefined)
             this.velocity = velocity;
+        if (mass != undefined)
+            this.mass = mass;
     }
 
     copyFromAgent(pAgent: Agent) {
@@ -254,5 +264,6 @@ export class AgentCfg {
         t.radius = pAgent.radius_;
         t.maxSpeed = pAgent.maxSpeed_;
         t.velocity = pAgent.velocity_;
+        t.mass = pAgent.mass_;
     }
 }

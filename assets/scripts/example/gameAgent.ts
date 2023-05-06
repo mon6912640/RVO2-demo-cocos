@@ -15,6 +15,8 @@ export default class GameAgent extends cc.Component {
     public targetSid: number = -1;
     public targetPos: Vector2;
 
+    speedFactor: number = 1;
+
     private _sidLab: cc.Label;
 
     onLoad() {
@@ -37,6 +39,7 @@ export default class GameAgent extends cc.Component {
 
     public updatePrefVelocity() {
         if (this.targetPos != null) {
+            let t_speedFactor = this.speedFactor;
             let curPos = Simulator.Instance.getAgentPosition(this._sid);
             let targetPos = this.targetPos;
 
@@ -44,7 +47,12 @@ export default class GameAgent extends cc.Component {
             if (RVOMath.absSq(goalVector) > 1) {
                 goalVector = RVOMath.normalize(goalVector);
             }
-            Simulator.Instance.setAgentPrefVelocity(this._sid, goalVector);
+            if (t_speedFactor != 1) {
+                Simulator.Instance.setAgentPrefVelocity(this._sid, Vector2.multiply2(t_speedFactor, goalVector));
+            }
+            else {
+                Simulator.Instance.setAgentPrefVelocity(this._sid, goalVector);
+            }
 
             //由于完美对称，稍微扰动一下以避免死锁,但是不注释坐标始终会有变化
             // let angle = Math.random() * 2.0 * Math.PI;

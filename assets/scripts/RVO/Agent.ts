@@ -27,6 +27,8 @@ export default class Agent {
     /** 最大速度，由于RVO中不考虑加速度，他是直接变速的，所以最大能变的速度是多少会和这个提前规避时间一起作用得到规避时的动作幅度 */
     public maxSpeed_: number;
 
+    public mass_: number = 1;
+
     public needDelete_: boolean = false;
 
     private newVelocity_: Vector2 = new Vector2(0, 0);
@@ -238,8 +240,25 @@ export default class Agent {
         for (let i = 0; i < this.agentNeighbors_.length; ++i) {
             let other = this.agentNeighbors_[i].Value;
             if (!other) continue;
+
+            //==============================================
+            //原版ORCA对所有单位一视同仁，没要考虑有些单位需要强制穿插移动
+            //这里引入了质量概念，质量大的物体，在使用ORCA计算速度时，自己的优先速度趋向于输入的优先速度，邻居的优先速度趋向于原始速度
+            let massRatio = this.mass_ / (this.mass_ + other.mass_);
+            let neighborMassRatio = other.mass_ / (this.mass_ + other.mass_);
+            let vOpt = (massRatio >= 0.5 ?
+                (this.velocity_.minus(this.velocity_.scale(massRatio)).scale(2))
+                :
+                this.prefVelocity_.add(this.velocity_.minus(this.prefVelocity_).scale(massRatio * 2)));
+            let neighborVOpt = (neighborMassRatio >= 0.5 ?
+                other.velocity_.scale(2).scale(1 - neighborMassRatio)
+                :
+                (other.prefVelocity_.add(other.velocity_.minus(other.prefVelocity_).scale(2 * neighborMassRatio))));
+            //==============================================
+
             let relativePosition = Vector2.subtract(other.position_, this.position_);
-            let relativeVelocity = Vector2.subtract(this.velocity_, other.velocity_);
+            // let relativeVelocity = Vector2.subtract(this.velocity_, other.velocity_);
+            let relativeVelocity = Vector2.subtract(vOpt, neighborVOpt);
             let distSq = RVOMath.absSq(relativePosition);
             let combinedRadius = this.radius_ + other.radius_;
             let combinedRadiusSq = RVOMath.sqr(combinedRadius);
@@ -277,7 +296,9 @@ export default class Agent {
                 line.direction = new Vector2(unitW.y, -unitW.x);
                 u = Vector2.multiply2(combinedRadius * invTimeStep - wLength, unitW);
             }
-            line.point = Vector2.addition(this.velocity_, Vector2.multiply2(0.5, u));
+            // line.point = Vector2.addition(this.velocity_, Vector2.multiply2(0.5, u));
+            // line.point = Vector2.addition(vOpt, Vector2.multiply2(0.5, u));
+            line.point = vOpt.add(u.scale(massRatio));
             this.orcaLines_[this.orcaLines_.length] = line;
         }
 

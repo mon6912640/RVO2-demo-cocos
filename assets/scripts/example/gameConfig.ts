@@ -2,7 +2,7 @@ import Vector2 from "../RVO/Vector2";
 
 export default class GameConfig {
     /**代理对象总数 */
-    public static agentCount = 50;
+    public static agentCount = 100;
     /**周围邻居的搜索距离（经过试验，neighborDist最好设置成radius的3倍） */
     public static neighborDist = 45;
     /**代理对象的半径（代理半径最好比实际显示半径略小3-5） */
@@ -17,6 +17,8 @@ export default class GameConfig {
     public static timeHorizon = 25;
     /**与timeHorizon类似，只针对障碍物 */
     public static timeHorizonObst = 5;
+
+    public static mass = 1;
 
     /**步骤帧 */
     public static gameTimeStep = 0.25;

@@ -10,6 +10,26 @@ export default class Vector2 {
             this.y = y;
     }
 
+    /** 向量加 */
+    add(vector: Vector2) {
+        return new Vector2(this.x + vector.x, this.y + vector.y);
+    }
+
+    /** 向量减 */
+    minus(vector: Vector2) {
+        return new Vector2(this.x - vector.x, this.y - vector.y);
+    }
+
+    /** 向量点乘/内积/数量积（结果是一个标量） */
+    multiply(vector: Vector2) {
+        return this.x * vector.x + this.y * vector.y;
+    }
+
+    /** 向量数乘（结果是一个向量） */
+    scale(scalar: number) {
+        return new Vector2(this.x * scalar, this.y * scalar);
+    }
+
     /**
      * 乘法
      * @param vector1 
