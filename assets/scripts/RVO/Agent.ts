@@ -29,8 +29,6 @@ export default class Agent {
 
     public mass_: number = 1;
 
-    public needDelete_: boolean = false;
-
     private newVelocity_: Vector2 = new Vector2(0, 0);
 
     public update() {

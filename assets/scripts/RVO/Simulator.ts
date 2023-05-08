@@ -1,3 +1,4 @@
+import { SMap } from "../common/SMap";
 import Agent from "./Agent";
 import KdTree from "./KdTree";
 import Obstacle from "./Obstacle";
@@ -16,10 +17,8 @@ export default class Simulator {
 
     public static s_totalID = 0;
 
-    public agentNo2indexDict_: Map<number, number>;
-    public index2agentNoDict_: Map<number, number>;
+    agentMap = new SMap<number, Agent>();
 
-    public agents_: Array<Agent> = [];
     public obstacles_: Array<Obstacle> = [];
     public kdTree_: KdTree;
     public timeStep_: number;
@@ -27,52 +26,55 @@ export default class Simulator {
     private defaultAgent_: Agent;
     private globalTime_: number;
 
+    private _change = false;
+
     constructor() {
         this.init();
     }
 
     private init() {
-        this.agents_ = [];
-        this.agentNo2indexDict_ = new Map();
-        this.index2agentNoDict_ = new Map();
         this.defaultAgent_ = null;
         this.kdTree_ = new KdTree();
         this.obstacles_ = [];
         this.globalTime_ = 0;
         this.timeStep_ = 0.1;
+    }
 
+    clear() {
+        let t = this;
+        t.agentMap.clear();
+        t._change = false;
+        t.kdTree_ = new KdTree();
+        t.obstacles_.length = 0;
+        t.globalTime_ = 0;
+        t.timeStep_ = 0.1;
     }
 
     public doStep() {
-        this.updateDeleteAgent();
+        let t = this;
+        let t_change = false;
+        if (t._change) {
+            t._change = false;
+            t_change = true;
+        }
 
-        this.kdTree_.buildAgentTree();
+        t.kdTree_.buildAgentTree(t_change);
 
-        for (let i = 0, j = this.agents_.length; i < j; i++) {
-            let agent = this.agents_[i];
+        let t_agents = t.agentMap.values();
+
+        for (let i = 0, j = t_agents.length; i < j; i++) {
+            let agent = t_agents[i];
             agent.computeNeighbors();
             agent.computeNewVelocity();
         }
 
-        for (let i = 0, j = this.agents_.length; i < j; i++) {
-            let agent = this.agents_[i];
+        for (let i = 0, j = t_agents.length; i < j; i++) {
+            let agent = t_agents[i];
             agent.update();
         }
 
-        this.globalTime_ += this.timeStep_;
-        return this.globalTime_;
-    }
-
-    private updateDeleteAgent() {
-        let isDelete = false;
-        for (let i = this.agents_.length - 1; i >= 0; i--) {
-            if (this.agents_[i].needDelete_) {
-                this.agents_.splice(i, 1);
-                isDelete = true;
-            }
-        }
-        if (isDelete)
-            this.onDelAgent();
+        t.globalTime_ += t.timeStep_;
+        return t.globalTime_;
     }
 
     public addAgent(position: Vector2, pCfg: AgentCfg = null) {
@@ -104,9 +106,17 @@ export default class Simulator {
             agent.mass_ = this.defaultAgent_.mass_;
         }
 
-        this.agents_.push(agent);
-        this.onAddAgent();
+        this.agentMap.set(agent.id_, agent);
+        this._change = true;
         return agent.id_;
+    }
+
+    removeAgent(pAgentId: number) {
+        let t = this;
+        if (t.agentMap.has(pAgentId)) {
+            t.agentMap.delete(pAgentId);
+            t._change = true;
+        }
     }
 
     public addObstacle(vertices: Array<Vector2>) {
@@ -142,29 +152,8 @@ export default class Simulator {
         return obstacleNo;
     }
 
-    private onDelAgent() {
-        this.agentNo2indexDict_.clear();
-        this.index2agentNoDict_.clear();
-
-        for (let i = 0; i < this.agents_.length; i++) {
-            let agentNo = this.agents_[i].id_;
-            this.agentNo2indexDict_.set(agentNo, i);
-            this.index2agentNoDict_.set(i, agentNo);
-        }
-    }
-
-    private onAddAgent() {
-        if (this.agents_.length == 0)
-            return;
-
-        let index = this.agents_.length - 1;
-        let agentNo = this.agents_[index].id_;
-        this.agentNo2indexDict_.set(agentNo, index);
-        this.index2agentNoDict_.set(index, agentNo);
-    }
-
-    public getAgentPosition(agentNo: number) {
-        let agent = this.agents_[this.agentNo2indexDict_.get(agentNo)];
+    public getAgentPosition(agentId: number) {
+        let agent = this.agentMap.get(agentId);
         if (agent) {
             return agent.position_;
         } else {
@@ -172,8 +161,12 @@ export default class Simulator {
         }
     }
 
-    public getAgentPrefVelocity(agentNo: number) {
-        return this.agents_[this.agentNo2indexDict_.get(agentNo)].prefVelocity_;
+    public getAgentPrefVelocity(agentId: number) {
+        let t = this;
+        let t_agent = t.agentMap.get(agentId);
+        if (t_agent) {
+            return t_agent.prefVelocity_;
+        }
     }
 
     public setTimeStep(timeStep: number) {
@@ -210,8 +203,12 @@ export default class Simulator {
         this.kdTree_.buildObstacleTree();
     }
 
-    public setAgentPrefVelocity(agentNo: number, prefVelocity: Vector2) {
-        this.agents_[this.agentNo2indexDict_.get(agentNo)].prefVelocity_ = prefVelocity;
+    public setAgentPrefVelocity(agentId: number, prefVelocity: Vector2) {
+        let t = this;
+        let t_agent = t.agentMap.get(agentId);
+        if (t_agent) {
+            t_agent.prefVelocity_ = prefVelocity;
+        }
     }
 }
 

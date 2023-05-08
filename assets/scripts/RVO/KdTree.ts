@@ -78,16 +78,15 @@ export default class KdTree {
     private agentTree_: AgentTreeNode[] = [];
     private MAX_LEAF_SIZE = 10;
 
-    public buildAgentTree() {
-        if (this.agents_ == null || this.agents_.length != Simulator.Instance.agents_.length) {
-            // this.agents_ = new Array(Simulator.Instance.agents_.length);
-            this.agents_.length = Simulator.Instance.agents_.length;
+    public buildAgentTree(pChange: boolean) {
+        if (this.agents_ == null || pChange) {
+            let t_sources = Simulator.Instance.agentMap.values();
+            this.agents_.length = t_sources.length;
             let len1 = this.agents_.length;
             for (let i = 0; i < len1; ++i) {
-                this.agents_[i] = Simulator.Instance.agents_[i];
+                this.agents_[i] = t_sources[i];
             }
 
-            // this.agentTree_ = [];
             this.agentTree_.length = 2 * this.agents_.length;
             let len = 2 * this.agents_.length;
             for (let i = 0; i < len; ++i) {
